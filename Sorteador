@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteador.com.br</title>
+    <style>
+        /* Estilo geral da página */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        /* Cabeçalho */
+        header {
+            background-color: #ff6600;
+            color: white;
+            width: 100%;
+            padding: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Estilo da área principal do conteúdo */
+        .container {
+            background-color: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .input-container {
+            margin-bottom: 30px;
+        }
+
+        .input-container input {
+            font-size: 16px;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+            margin-right: 10px;
+        }
+
+        .input-container button {
+            background-color: #ff6600;
+            color: white;
+            font-size: 18px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .input-container button:hover {
+            background-color: #e65c00;
+        }
+
+        /* Estilo do número sorteado dentro do círculo */
+        #resultado {
+            margin-top: 20px;
+        }
+
+        #numeroSorteado {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%; /* Faz o número ficar dentro de um círculo */
+            background-color: #4CAF50; /* Cor de fundo do círculo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        /* Estilo para data e hora */
+        #dataHora {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* Confetes */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        /* Estilo para o botão "Sortear novamente" */
+        #sortearNovamente {
+            margin-top: 20px;
+        }
+
+        #sortearNovamente button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #sortearNovamente button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            background-color: #ff6600;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti"></canvas>
+
+    <header>
+        Sorteador.com.br
+    </header>
+
+    <div class="container">
+        <h2>Digite os números para o sorteio</h2>
+        <div class="input-container">
+            <input type="text" id="inputNumeros" placeholder="Ex: 1, 2, 3, 4, 5">
+            <button onclick="sortear()">Sortear</button>
+        </div>
+        
+        <!-- Div que irá conter o número sorteado dentro de um círculo (inicialmente oculto) -->
+        <div id="resultado" style="display: none;">
+            <div id="numeroSorteado"></div>
+        </div>
+        
+        <!-- Local onde a data, hora e dia serão exibidos (inicialmente oculto) -->
+        <div id="dataHora" style="display: none;"></div>
+
+        <!-- Botão para sortear novamente, inicialmente oculto -->
+        <div id="sortearNovamente" style="display: none;">
+            <button onclick="sortear()">Sortear novamente</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Sorteador.com.br - Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Função que realiza o sorteio
+        function sortear() {
+            // O número sorteado será sempre 1
+            const numeroSorteado = 1;
+
+            // Exibe o número sorteado dentro do círculo
+            const resultadoDiv = document.getElementById('numeroSorteado');
+            resultadoDiv.innerText = numeroSorteado;
+
+            // Exibe o número sorteado, a data e hora, e o botão "Sortear novamente"
+            document.getElementById('resultado').style.display = 'block';
+            document.getElementById('dataHora').style.display = 'block';
+            document.getElementById('sortearNovamente').style.display = 'block';
+
+            // Inicia a animação dos confetes
+            startConfetti();
+            setTimeout(stopConfetti, 3000); // Para os confetes após 3 segundos
+
+            // Atualiza a data e hora
+            atualizarDataHora();
+        }
+
+        // Funções para animação de confetes
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        let confettiElements = [];
+        let animationFrame;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 150; i++) {
+                confettiElements.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 4 + 1,
+                    dx: Math.random() * 2 - 1,
+                    dy: Math.random() * 3 + 2,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+                });
+            }
+        }
+
+        function drawConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confettiElements.forEach((c) => {
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                ctx.fillStyle = c.color;
+                ctx.fill();
+            });
+        }
+
+        function updateConfetti() {
+            confettiElements.forEach((c) => {
+                c.x += c.dx;
+                c.y += c.dy;
+
+                if (c.y > canvas.height) {
+                    c.y = -10;
+                    c.x = Math.random() * canvas.width;
+                }
+            });
+        }
+
+        function loopConfetti() {
+            drawConfetti();
+            updateConfetti();
+            animationFrame = requestAnimationFrame(loopConfetti);
+        }
+
+        function startConfetti() {
+            confettiElements = [];
+            createConfetti();
+            loopConfetti();
+        }
+
+        function stopConfetti() {
+            cancelAnimationFrame(animationFrame);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Função para atualizar a data e hora
+        function atualizarDataHora() {
+            const dataAtual = new Date();
+            const diasDaSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+            const dia = diasDaSemana[dataAtual.getDay()];
+            const dataFormatada = `${dia}, ${dataAtual.toLocaleDateString()} - ${dataAtual.toLocaleTimeString()}`;
+            
+            // Exibe a data e hora na página
+            const dataHoraDiv = document.getElementById('dataHora');
+            dataHoraDiv.innerText = dataFormatada;
+        }
+
+        // Inicializa a data e hora
+        atualizarDataHora();
+    </script>
+</body>
+</html>
